@@ -45,6 +45,10 @@ public class UserFrame extends JFrame {
             StationLine.showStationLine();
         });
 
+        searchStationButton.addActionListener(e -> {
+            SearchStation.showStationQuery();
+        });
+
         add(buttonPanel, BorderLayout.CENTER);
         JButton exitButton = new JButton("退出");
         add(exitButton, BorderLayout.SOUTH);
