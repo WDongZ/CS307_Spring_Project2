@@ -49,6 +49,18 @@ public class UserFrame extends JFrame {
             SearchStation.showStationQuery();
         });
 
+        passengerBoardButton.addActionListener(e -> {
+            PassengerRecordFrame.showPassengerRecord();
+        });
+
+        passengerDisembarkButton.addActionListener(e -> {
+            PassengerOutFrame.showPassengerOut();
+        });
+
+        searchPassengerButton.addActionListener(e -> {
+            new PassengerQueryFrame();
+        });
+
         add(buttonPanel, BorderLayout.CENTER);
         JButton exitButton = new JButton("退出");
         add(exitButton, BorderLayout.SOUTH);

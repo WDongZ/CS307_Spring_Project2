@@ -1,9 +1,9 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
-public class PassengerRecordFrame {
-    public static void showPassengerRecord() {
-        JFrame frame = new JFrame("Passenger Record");
+public class PassengerOutFrame {
+    public static void showPassengerOut() {
+        JFrame frame = new JFrame("Passenger Out");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel recordPanel = new JPanel();
@@ -33,7 +33,7 @@ public class PassengerRecordFrame {
                                 .addComponent(idCardRadioButton)
                                 .addComponent(stationLabel)
                                 .addComponent(timeLabel))
-                                .addComponent(IDLabel)
+                        .addComponent(IDLabel)
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                 .addComponent(travelCardRadioButton)
                                 .addComponent(stationTextField)
@@ -68,10 +68,10 @@ public class PassengerRecordFrame {
             String time = timeTextField.getText();
             String ID = IDTextField.getText();
             if (cardType.equals("Passenger ID")) {
-                String psInfo = DbCtrl.passengerRecord(station, time, ID);
+                String psInfo = DbCtrl.outPassengerRecord(station, time, ID);
                 JOptionPane.showMessageDialog(null, psInfo);
             } else {
-                String cdInfo = DbCtrl.cardRecord(station, time, ID);
+                String cdInfo = DbCtrl.outCardRecord(station, time, ID);
                 JOptionPane.showMessageDialog(null, cdInfo);
             }
         });

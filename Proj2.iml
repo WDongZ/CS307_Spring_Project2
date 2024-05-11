@@ -17,5 +17,6 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="JGoodies Forms" level="project" />
+    <orderEntry type="library" name="lib" level="project" />
   </component>
 </module>
