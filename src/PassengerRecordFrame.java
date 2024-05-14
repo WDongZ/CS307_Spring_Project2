@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class PassengerRecordFrame {
     public static void showPassengerRecord() {
@@ -20,8 +22,6 @@ public class PassengerRecordFrame {
 
         JLabel stationLabel = new JLabel("Station:");
         JTextField stationTextField = new JTextField(10);
-        JLabel timeLabel = new JLabel("Time:");
-        JTextField timeTextField = new JTextField(10);
         JLabel IDLabel = new JLabel("ID:");
         JTextField IDTextField = new JTextField(20);
         JButton confirmButton = new JButton("Confirm");
@@ -32,12 +32,11 @@ public class PassengerRecordFrame {
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                 .addComponent(idCardRadioButton)
                                 .addComponent(stationLabel)
-                                .addComponent(timeLabel))
                                 .addComponent(IDLabel)
+                        )
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                 .addComponent(travelCardRadioButton)
                                 .addComponent(stationTextField)
-                                .addComponent(timeTextField)
                                 .addComponent(IDTextField)
                                 .addComponent(confirmButton)
                                 .addComponent(exitButton)
@@ -53,9 +52,6 @@ public class PassengerRecordFrame {
                                 .addComponent(stationLabel)
                                 .addComponent(stationTextField))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(timeLabel)
-                                .addComponent(timeTextField))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(IDLabel)
                                 .addComponent(IDTextField))
                         .addComponent(confirmButton)
@@ -65,8 +61,10 @@ public class PassengerRecordFrame {
         confirmButton.addActionListener((ActionEvent e) -> {
             String cardType = idCardRadioButton.isSelected() ? "Passenger ID" : "Card ID";
             String station = stationTextField.getText();
-            String time = timeTextField.getText();
             String ID = IDTextField.getText();
+            Date date = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String time = sdf.format(date);
             if (cardType.equals("Passenger ID")) {
                 String psInfo = DbCtrl.passengerRecord(station, time, ID);
                 JOptionPane.showMessageDialog(null, psInfo);
