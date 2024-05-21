@@ -9,6 +9,7 @@ public class Login {
         JPanel panel = new JPanel();
         frame.add(panel);
         placeComponents(panel);
+        frame.setLocation(800, 400);
         frame.setVisible(true);
         waitForLogin(panel, frame);
     }
