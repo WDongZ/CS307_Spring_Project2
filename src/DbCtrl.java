@@ -1,5 +1,6 @@
 import java.sql.*;
-import java.util.ArrayList;
+import java.sql.Date;
+import java.util.*;
 
 public class DbCtrl {
     public static void connect(String user, String password) throws SQLException {
@@ -500,6 +501,43 @@ public class DbCtrl {
         }
     }
 
+    public static String queryPath (String startStation, String endStation) {
+        String sql = "select path from path where start_station_id = (select id from station where chinese_name = ?) and end_station_id = (select id from station where chinese_name = ?)";
+        String sqlPre = "select count(*) from station where chinese_name = ?";
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
+            PreparedStatement ps = conn.prepareStatement(sql);
+            PreparedStatement psPre = conn.prepareStatement(sqlPre);
+            PreparedStatement psPre2 = conn.prepareStatement(sqlPre);
+            psPre.setString(1, startStation);
+            ResultSet rs1 = psPre.executeQuery();
+            psPre2.setString(1, endStation);
+            ResultSet rs2 = psPre2.executeQuery();
+            rs1.next();
+            rs2.next();
+            if (rs1.getInt(1) == 0) {
+                return " \" " + startStation + "\"  not found";
+            }
+            if (rs2.getInt(1) == 0) {
+                return " \" " + endStation + "\"  not found";
+            }
+            ps.setString(1, startStation);
+            ps.setString(2, endStation);
+            ResultSet resultSet = ps.executeQuery();
+            resultSet.next();
+            String result = resultSet.getString(1);
+            resultSet.close();
+            ps.close();
+            conn.close();
+            rs1.close();
+            rs2.close();
+            return result;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return e.getSQLState() + ": " + e.getMessage();
+        }
+    }
+
     public static ArrayList<String> queryCard () {
         String sql = "select code, money, create_time from card where id in (select card_id from card_on)";
         ArrayList<String> result = new ArrayList<>();
@@ -629,7 +667,6 @@ public class DbCtrl {
             this.firstOpening = firstOpening;
             this.url = url;
         }
-
     }
 
 }

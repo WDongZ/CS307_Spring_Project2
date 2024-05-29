@@ -23,6 +23,7 @@ public class UserFrame extends JFrame {
         JButton passengerBoardButton = new JButton("乘客上车");
         JButton passengerDisembarkButton = new JButton("乘客下车");
         JButton searchPassengerButton = new JButton("查询乘客");
+        JButton searchPathButton = new JButton("查询路径");
 
 
         buttonPanel.add(modifyStationButton);
@@ -32,6 +33,7 @@ public class UserFrame extends JFrame {
         buttonPanel.add(passengerBoardButton);
         buttonPanel.add(passengerDisembarkButton);
         buttonPanel.add(searchPassengerButton);
+        buttonPanel.add(searchPathButton);
 
         modifyStationButton.addActionListener(e -> {
             ModifyStations.ModifyStation();
@@ -59,6 +61,10 @@ public class UserFrame extends JFrame {
 
         searchPassengerButton.addActionListener(e -> {
             new PassengerQueryFrame();
+        });
+
+        searchPathButton.addActionListener(e -> {
+            QueryPathFrame.showPathQuery();
         });
 
         add(buttonPanel, BorderLayout.CENTER);
