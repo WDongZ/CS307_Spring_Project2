@@ -1,9 +1,12 @@
-import javax.swing.*;
-import java.awt.event.ActionEvent;
+package view;
 
-public class SearchStation {
-    public static void showStationQuery() {
-        JFrame frame = new JFrame("Station Query");
+import model.DbCtrl;
+
+import javax.swing.*;
+
+public class StationLineFrame {
+    public static void showStationLine() {
+        JFrame frame = new JFrame("Station Lines");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel operationPanel = new JPanel();
@@ -12,46 +15,43 @@ public class SearchStation {
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
 
-        JRadioButton forwardRadioButton = new JRadioButton("Count Forward");
-        JRadioButton backwardRadioButton = new JRadioButton("Count Backward");
-        ButtonGroup directionGroup = new ButtonGroup();
-        directionGroup.add(forwardRadioButton);
-        directionGroup.add(backwardRadioButton);
+        JRadioButton addRadioButton = new JRadioButton("Insert");
+        JRadioButton deleteRadioButton = new JRadioButton("Delete");
+        ButtonGroup operationGroup = new ButtonGroup();
+        operationGroup.add(addRadioButton);
+        operationGroup.add(deleteRadioButton);
 
-        JLabel metroLineLabel = new JLabel("Line:");
+        JLabel metroLineLabel = new JLabel("Metro Line:");
         JTextField metroLineTextField = new JTextField(10);
-        JLabel metroStationLabel = new JLabel("Station:");
+        JLabel metroStationLabel = new JLabel("Metro Station:");
         JTextField metroStationTextField = new JTextField(10);
-        JLabel numberLabel = new JLabel("Station Number:");
-        JTextField numberTextField = new JTextField(10);
+        JLabel stationPositionLabel = new JLabel("Station Position:");
+        JTextField stationPosition = new JTextField(10);
         JButton confirmButton = new JButton("Confirm");
         JButton exitButton = new JButton("Exit");
-        JTextArea resultTextArea = new JTextArea(10, 30);
-        resultTextArea.setEditable(false);
 
         layout.setHorizontalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                .addComponent(forwardRadioButton)
+                                .addComponent(addRadioButton)
                                 .addComponent(metroLineLabel)
                                 .addComponent(metroStationLabel)
-                                .addComponent(numberLabel))
+                                .addComponent(stationPositionLabel))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                .addComponent(backwardRadioButton)
+                                .addComponent(deleteRadioButton)
                                 .addComponent(metroLineTextField)
                                 .addComponent(metroStationTextField)
-                                .addComponent(numberTextField)
+                                .addComponent(stationPosition)
                                 .addComponent(confirmButton)
                                 .addComponent(exitButton)
-                                .addComponent(resultTextArea)
                         )
         );
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(forwardRadioButton)
-                                .addComponent(backwardRadioButton))
+                                .addComponent(addRadioButton)
+                                .addComponent(deleteRadioButton))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(metroLineLabel)
                                 .addComponent(metroLineTextField))
@@ -59,23 +59,22 @@ public class SearchStation {
                                 .addComponent(metroStationLabel)
                                 .addComponent(metroStationTextField))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(numberLabel)
-                                .addComponent(numberTextField))
+                                .addComponent(stationPositionLabel)
+                                .addComponent(stationPosition))
                         .addComponent(confirmButton)
                         .addComponent(exitButton)
-                        .addComponent(resultTextArea)
         );
 
-        confirmButton.addActionListener((ActionEvent e) -> {
+        confirmButton.addActionListener(e -> {
             String metroLine = metroLineTextField.getText();
             String metroStation = metroStationTextField.getText();
-            int number = Integer.parseInt(numberTextField.getText());
-            if (forwardRadioButton.isSelected()) {
-                String result = DbCtrl.queryForwardStation(metroLine, metroStation, number);
-                resultTextArea.setText(result);
-            } else if (backwardRadioButton.isSelected()) {
-                String result = DbCtrl.queryForwardStation(metroLine, metroStation, number * -1);
-                resultTextArea.setText(result);
+            String position = stationPosition.getText();
+            if (addRadioButton.isSelected()) {
+                String insertInfo = DbCtrl.insertStationLine(metroLine, metroStation, Integer.parseInt(position));
+                JOptionPane.showMessageDialog(null, insertInfo);
+            } else if (deleteRadioButton.isSelected()) {
+                String deleteInfo = DbCtrl.deleteStationLine(metroLine, metroStation);
+                JOptionPane.showMessageDialog(null, deleteInfo);
             }
         });
 
@@ -87,4 +86,6 @@ public class SearchStation {
         frame.setSize(600, 400);
         frame.setVisible(true);
     }
+
+
 }

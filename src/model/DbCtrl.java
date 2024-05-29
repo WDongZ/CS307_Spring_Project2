@@ -1,8 +1,19 @@
+package model;
+
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
 
 public class DbCtrl {
+    private static Connection conn;
+
+    static {
+        try {
+            conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
     public static void connect(String user, String password) throws SQLException {
         String url = "jdbc:postgresql://localhost:5432/project";
         Connection conn = DriverManager.getConnection(url, user, password);
@@ -16,7 +27,6 @@ public class DbCtrl {
     static String insertStation(Station station){
         String sql = "insert into station (district, intro, chinese_name, english_name) values (?, ?, ?, ?)";
         try {
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, station.district);
             ps.setString(2, station.intro);
@@ -36,7 +46,6 @@ public class DbCtrl {
         String sqlPre = "select count(*) from station where chinese_name = ?";
         String sql = "delete from station where chinese_name = ?";
         try {
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
             PreparedStatement psPre = conn.prepareStatement(sqlPre);
             PreparedStatement ps = conn.prepareStatement(sql);
             psPre.setString(1, chineseName);
@@ -61,7 +70,6 @@ public class DbCtrl {
         String sqlPre = "select count(*) from station where chinese_name = ?";
         String sql = "update station set district = ?, intro = ?, chinese_name = ?, english_name = ? where chinese_name = ?";
         try {
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
             PreparedStatement psPre = conn.prepareStatement(sqlPre);
             PreparedStatement ps = conn.prepareStatement(sql);
             psPre.setString(1, modifyStation);
@@ -89,7 +97,6 @@ public class DbCtrl {
     static String insertLine(Line line){
         String sql = "insert into line (line_name, start_time, end_time, intro, mileage, color, first_opening, url) values (?, ?, ?, ?, ?, ?, ?, ?)";
         try {
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, line.lineName);
             ps.setTime(2, Time.valueOf(line.startTime));
@@ -113,7 +120,6 @@ public class DbCtrl {
         String sqlPre = "select count(*) from line where line_name = ?";
         String sql = "delete from line where line_name = ?";
         try {
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
             PreparedStatement psPre = conn.prepareStatement(sqlPre);
             PreparedStatement ps = conn.prepareStatement(sql);
             psPre.setString(1, lineName);
@@ -138,7 +144,6 @@ public class DbCtrl {
         String sqlPre = "select count(*) from line where line_name = ?";
         String sql = "update line set line_name = ?, start_time = ?, end_time = ?, intro = ?, mileage = ?, color = ?, first_opening = ?, url = ? where line_name = ?";
         try {
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
             PreparedStatement psPre = conn.prepareStatement(sqlPre);
             PreparedStatement ps = conn.prepareStatement(sql);
             psPre.setString(1, modifyLine);
@@ -167,12 +172,11 @@ public class DbCtrl {
         }
     }
 
-    static String insertStationLine(String lineName, String stationName, int position){
+    public static String insertStationLine(String lineName, String stationName, int position){
         String sql = "insert into line_station (line_id,station_id,position) select l.id, s.id, ? from line l,station s where l.line_name = ? and s.chinese_name = ?";
         String sqlPre = "select count(*) from line where line_name = ?";
         String sqlPre2 = "select count(*) from station where chinese_name = ?";
         try {
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
             PreparedStatement ps = conn.prepareStatement(sql);
             PreparedStatement psPre = conn.prepareStatement(sqlPre);
             PreparedStatement psPre2 = conn.prepareStatement(sqlPre2);
@@ -203,12 +207,11 @@ public class DbCtrl {
         }
     }
 
-    static String deleteStationLine(String lineName, String stationName){
+    public static String deleteStationLine(String lineName, String stationName){
         String sql = "delete from line_station where line_id = (select id from line where line_name = ?) and station_id = (select id from station where chinese_name = ?)";
         String sqlPre = "select count(*) from line where line_name = ?";
         String sqlPre2 = "select count(*) from station where chinese_name = ?";
         try {
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
             PreparedStatement ps = conn.prepareStatement(sql);
             PreparedStatement psPre = conn.prepareStatement(sqlPre);
             PreparedStatement psPre2 = conn.prepareStatement(sqlPre2);
@@ -244,7 +247,6 @@ public class DbCtrl {
         String sqlPre = "select count(*) from station where chinese_name = ?";
         String sqlPre2 = "select count(*) from passenger where id_number = ?";
         try {
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
             PreparedStatement ps = conn.prepareStatement(sql);
             PreparedStatement psPre = conn.prepareStatement(sqlPre);
             PreparedStatement psPre2 = conn.prepareStatement(sqlPre2);
@@ -280,7 +282,6 @@ public class DbCtrl {
         String sqlPre = "select count(*) from station where chinese_name = ?";
         String sqlPre2 = "select count(*) from card where code = ?";
         try {
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
             PreparedStatement ps = conn.prepareStatement(sql);
             PreparedStatement psPre = conn.prepareStatement(sqlPre);
             PreparedStatement psPre2 = conn.prepareStatement(sqlPre2);
@@ -321,7 +322,6 @@ public class DbCtrl {
         String sqlPre = "select count(*) from station where chinese_name = ?";
         String sqlPre2 = "select count(*) from card where code = ?";
         try {
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
             PreparedStatement psGetStartStationId = conn.prepareStatement(getStartStationId);
             PreparedStatement psGetEndStationId = conn.prepareStatement(getEndStationId);
             PreparedStatement psGetStartTime = conn.prepareStatement(getStartTime);
@@ -402,7 +402,6 @@ public class DbCtrl {
         String sqlPre2 = "select count(*) from passenger where id_number = ?";
         String sqlPre3 = "select count(*) from passenger_on where passenger_id = (select id from passenger where id_number = ?)";
         try {
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
             PreparedStatement psGetStartStationId = conn.prepareStatement(getStartStationId);
             PreparedStatement psGetEndStationId = conn.prepareStatement(getEndStationId);
             PreparedStatement psGetStartTime = conn.prepareStatement(getStartTime);
@@ -484,7 +483,6 @@ public class DbCtrl {
         String sql = "select name, id_number, phone_number, gender, district from passenger where id in (select passenger_id from passenger_on)";
         ArrayList<String> result = new ArrayList<>();
         try {
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {
@@ -505,7 +503,6 @@ public class DbCtrl {
         String sql = "select path from path where start_station_id = (select id from station where chinese_name = ?) and end_station_id = (select id from station where chinese_name = ?)";
         String sqlPre = "select count(*) from station where chinese_name = ?";
         try {
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
             PreparedStatement ps = conn.prepareStatement(sql);
             PreparedStatement psPre = conn.prepareStatement(sqlPre);
             PreparedStatement psPre2 = conn.prepareStatement(sqlPre);
@@ -542,7 +539,6 @@ public class DbCtrl {
         String sql = "select code, money, create_time from card where id in (select card_id from card_on)";
         ArrayList<String> result = new ArrayList<>();
         try {
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {
@@ -629,6 +625,34 @@ public class DbCtrl {
             return e.getSQLState() + ": " + e.getMessage();
         }
 
+    }
+    public static String query(String sql){
+        StringBuilder result = new StringBuilder();
+        try (Statement statement = conn.createStatement()) {
+            boolean isResultSet = statement.execute(sql);
+            if (isResultSet) {
+                try (ResultSet resultSet = statement.getResultSet()) {
+                    ResultSetMetaData metaData = resultSet.getMetaData();
+                    int columnCount = metaData.getColumnCount();
+                    for (int i = 1; i <= columnCount; i++) {
+                        result.append(metaData.getColumnName(i)).append("\t");
+                    }
+                    result.append("\n");
+                    while (resultSet.next()) {
+                        for (int i = 1; i <= columnCount; i++) {
+                            result.append(resultSet.getString(i)).append("\t");
+                        }
+                        result.append("\n");
+                    }
+                    return result.toString();
+                }
+            } else {
+                int updateCount = statement.getUpdateCount();
+                return "更新计数: " + updateCount;
+            }
+        } catch (SQLException ex) {
+            return "执行失败: " + ex.getMessage();
+        }
     }
 
     static class Station{

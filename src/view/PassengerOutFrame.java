@@ -1,11 +1,15 @@
+package view;
+
+import model.DbCtrl;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class PassengerRecordFrame {
-    public static void showPassengerRecord() {
-        JFrame frame = new JFrame("Passenger Record");
+public class PassengerOutFrame {
+    public static void showPassengerOut() {
+        JFrame frame = new JFrame("Passenger Out");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel recordPanel = new JPanel();
@@ -32,7 +36,7 @@ public class PassengerRecordFrame {
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                 .addComponent(idCardRadioButton)
                                 .addComponent(stationLabel)
-                                .addComponent(IDLabel)
+                        .addComponent(IDLabel)
                         )
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                 .addComponent(travelCardRadioButton)
@@ -66,10 +70,10 @@ public class PassengerRecordFrame {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String time = sdf.format(date);
             if (cardType.equals("Passenger ID")) {
-                String psInfo = DbCtrl.passengerRecord(station, time, ID);
+                String psInfo = DbCtrl.outPassengerRecord(station, time, ID);
                 JOptionPane.showMessageDialog(null, psInfo);
             } else {
-                String cdInfo = DbCtrl.cardRecord(station, time, ID);
+                String cdInfo = DbCtrl.outCardRecord(station, time, ID);
                 JOptionPane.showMessageDialog(null, cdInfo);
             }
         });

@@ -3,7 +3,7 @@ import psycopg2
 import pandas as pd
 
 # 读取 Excel 文件
-file_path = './Price.xlsx'
+file_path = '../Price.xlsx'
 workbook = openpyxl.load_workbook(file_path)
 sheet = workbook.active
 
