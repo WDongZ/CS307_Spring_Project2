@@ -1,6 +1,9 @@
+package view;
+
+import model.DbCtrl;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-
 public class QueryPathFrame {
     public static void showPathQuery() {
         JFrame frame = new JFrame("Path Query");
