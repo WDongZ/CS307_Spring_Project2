@@ -1,171 +1,252 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class ModifyLines {
     public static void ModifyLine() {
         JFrame frame = new JFrame("Modify Lines");
         frame.setSize(600, 400);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        SubwayManagementPanel panel = new SubwayManagementPanel();
-        frame.add(panel);
-        setExitButton(panel.exitButton, frame);
+
+        // Create a tabbed pane
+        JTabbedPane tabbedPane = new JTabbedPane();
+
+        // Create panels for each tab
+        JPanel modifyPanel = createModifyPanel();
+        JPanel insertPanel = createInsertPanel();
+        JPanel deletePanel = createDeletePanel();
+
+        // Add each panel to the tabbed pane with a title
+        tabbedPane.addTab("Modify", modifyPanel);
+        tabbedPane.addTab("Insert", insertPanel);
+        tabbedPane.addTab("Delete", deletePanel);
+
+        // Add the tabbed pane to the frame
+        frame.add(tabbedPane, BorderLayout.CENTER);
+
+        // Add exit button
+        JButton exitButton = new JButton("Exit");
+        frame.add(exitButton, BorderLayout.SOUTH);
+        exitButton.addActionListener(e -> frame.setVisible(false));
+
         frame.setVisible(true);
     }
-    private static void setExitButton(JButton exitButton, JFrame frame) {
-        exitButton.addActionListener(e -> {
-            frame.setVisible(false);
+
+    private static JPanel createModifyPanel() {
+        JPanel panel = new JPanel();
+        GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        JLabel modifyLineLabel = new JLabel("Modify Line:");
+        JTextField modifyLineField = new JTextField(20);
+        JLabel lineNameLabel = new JLabel("Line Name:");
+        JTextField lineNameField = new JTextField(20);
+        JLabel startTimeLabel = new JLabel("Start Time:");
+        JTextField startTimeField = new JTextField(20);
+        JLabel endTimeLabel = new JLabel("End Time:");
+        JTextField endTimeField = new JTextField(20);
+        JLabel introLabel = new JLabel("Intro:");
+        JTextField introField = new JTextField(20);
+        JLabel mileageLabel = new JLabel("Mileage:");
+        JTextField mileageField = new JTextField(20);
+        JLabel colorLabel = new JLabel("Color:");
+        JTextField colorField = new JTextField(20);
+        JLabel firstOpeningLabel = new JLabel("First Opening:");
+        JTextField firstOpeningField = new JTextField(20);
+        JLabel urlLabel = new JLabel("URL:");
+        JTextField urlField = new JTextField(20);
+        JButton confirmModifyButton = new JButton("Confirm");
+
+        layout.setHorizontalGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                        .addComponent(modifyLineLabel)
+                        .addComponent(lineNameLabel)
+                        .addComponent(startTimeLabel)
+                        .addComponent(endTimeLabel)
+                        .addComponent(introLabel)
+                        .addComponent(mileageLabel)
+                        .addComponent(colorLabel)
+                        .addComponent(firstOpeningLabel)
+                        .addComponent(urlLabel))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(modifyLineField)
+                        .addComponent(lineNameField)
+                        .addComponent(startTimeField)
+                        .addComponent(endTimeField)
+                        .addComponent(introField)
+                        .addComponent(mileageField)
+                        .addComponent(colorField)
+                        .addComponent(firstOpeningField)
+                        .addComponent(urlField)
+                        .addComponent(confirmModifyButton)));
+
+        layout.setVerticalGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(modifyLineLabel)
+                        .addComponent(modifyLineField))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(lineNameLabel)
+                        .addComponent(lineNameField))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(startTimeLabel)
+                        .addComponent(startTimeField))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(endTimeLabel)
+                        .addComponent(endTimeField))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(introLabel)
+                        .addComponent(introField))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(mileageLabel)
+                        .addComponent(mileageField))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(colorLabel)
+                        .addComponent(colorField))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(firstOpeningLabel)
+                        .addComponent(firstOpeningField))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(urlLabel)
+                        .addComponent(urlField))
+                .addComponent(confirmModifyButton));
+
+        confirmModifyButton.addActionListener(e -> {
+            String modifyLine = modifyLineField.getText();
+            String lineName = lineNameField.getText();
+            String startTime = startTimeField.getText();
+            String endTime = endTimeField.getText();
+            String intro = introField.getText();
+            String mileage = mileageField.getText();
+            String color = colorField.getText();
+            String firstOpening = firstOpeningField.getText();
+            String url = urlField.getText();
+            String result = DbCtrl.modifyLine(modifyLine, new DbCtrl.Line(lineName, startTime, endTime, intro, mileage, color, firstOpening, url));
+            JOptionPane.showMessageDialog(null, result);
         });
+
+        return panel;
     }
 
-    static class SubwayManagementPanel extends JPanel {
-        private String[] actions = {"Insert", "Modify", "Delete"};
-        private JComboBox<String> actionComboBox;
-        private JTextField textField1;
-        private JTextField textField2;
-        private JTextField textField3;
-        private JTextField textField4;
-        private JTextField textField5;
-        private JTextField textField6;
-        private JTextField textField7;
-        private JTextField textField8;
-        private JTextField textField9;
-        private JButton confirmButton;
-        private JButton exitButton;
+    private static JPanel createInsertPanel() {
+        JPanel panel = new JPanel();
+        GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
 
-        public SubwayManagementPanel() {
-            setLayout(new GridLayout(0, 2));
+        JLabel lineNameLabel = new JLabel("Line Name:");
+        JTextField lineNameField = new JTextField(20);
+        JLabel startTimeLabel = new JLabel("Start Time:");
+        JTextField startTimeField = new JTextField(20);
+        JLabel endTimeLabel = new JLabel("End Time:");
+        JTextField endTimeField = new JTextField(20);
+        JLabel introLabel = new JLabel("Intro:");
+        JTextField introField = new JTextField(20);
+        JLabel mileageLabel = new JLabel("Mileage:");
+        JTextField mileageField = new JTextField(20);
+        JLabel colorLabel = new JLabel("Color:");
+        JTextField colorField = new JTextField(20);
+        JLabel firstOpeningLabel = new JLabel("First Opening:");
+        JTextField firstOpeningField = new JTextField(20);
+        JLabel urlLabel = new JLabel("URL:");
+        JTextField urlField = new JTextField(20);
+        JButton confirmInsertButton = new JButton("Confirm");
 
-            // Dropdown for selecting action
-            actionComboBox = new JComboBox<>(actions);
-            add(new JLabel("Select Action:"));
-            add(actionComboBox);
+        layout.setHorizontalGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                        .addComponent(lineNameLabel)
+                        .addComponent(startTimeLabel)
+                        .addComponent(endTimeLabel)
+                        .addComponent(introLabel)
+                        .addComponent(mileageLabel)
+                        .addComponent(colorLabel)
+                        .addComponent(firstOpeningLabel)
+                        .addComponent(urlLabel))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(lineNameField)
+                        .addComponent(startTimeField)
+                        .addComponent(endTimeField)
+                        .addComponent(introField)
+                        .addComponent(mileageField)
+                        .addComponent(colorField)
+                        .addComponent(firstOpeningField)
+                        .addComponent(urlField)
+                        .addComponent(confirmInsertButton)));
 
-            // Text fields for action parameters
-            textField1 = new JTextField(20);
-            textField2 = new JTextField(20);
-            textField3 = new JTextField(20);
-            textField4 = new JTextField(20);
-            textField5 = new JTextField(20);
-            textField6 = new JTextField(20);
-            textField7 = new JTextField(20);
-            textField8 = new JTextField(20);
-            textField9 = new JTextField(20);
+        layout.setVerticalGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(lineNameLabel)
+                        .addComponent(lineNameField))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(startTimeLabel)
+                        .addComponent(startTimeField))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(endTimeLabel)
+                        .addComponent(endTimeField))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(introLabel)
+                        .addComponent(introField))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(mileageLabel)
+                        .addComponent(mileageField))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(colorLabel)
+                        .addComponent(colorField))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(firstOpeningLabel)
+                        .addComponent(firstOpeningField))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(urlLabel)
+                        .addComponent(urlField))
+                .addComponent(confirmInsertButton));
 
-            // Hide all text fields initially
-            textField1.setVisible(false);
-            textField2.setVisible(false);
-            textField3.setVisible(false);
-            textField4.setVisible(false);
-            textField5.setVisible(false);
-            textField6.setVisible(false);
-            textField7.setVisible(false);
-            textField8.setVisible(false);
-            textField9.setVisible(false);
+        confirmInsertButton.addActionListener(e -> {
+            String lineName = lineNameField.getText();
+            String startTime = startTimeField.getText();
+            String endTime = endTimeField.getText();
+            String intro = introField.getText();
+            String mileage = mileageField.getText();
+            String color = colorField.getText();
+            String firstOpening = firstOpeningField.getText();
+            String url = urlField.getText();
+            String result = DbCtrl.insertLine(new DbCtrl.Line(lineName, startTime, endTime, intro, mileage, color, firstOpening, url));
+            JOptionPane.showMessageDialog(null, result);
+        });
 
-            // Action listener for the dropdown
-            actionComboBox.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    String selectedAction = (String) actionComboBox.getSelectedItem();
-                    if (selectedAction.equals("Modify")) {
-                        textField1.setVisible(true);
-                        textField2.setVisible(true);
-                        textField3.setVisible(true);
-                        textField4.setVisible(true);
-                        textField5.setVisible(true);
-                        textField6.setVisible(true);
-                        textField7.setVisible(true);
-                        textField8.setVisible(true);
-                        textField9.setVisible(true);
-                    } else if (selectedAction.equals("Insert")) {
-                        textField1.setVisible(false);
-                        textField2.setVisible(true);
-                        textField3.setVisible(true);
-                        textField4.setVisible(true);
-                        textField5.setVisible(true);
-                        textField6.setVisible(true);
-                        textField7.setVisible(true);
-                        textField8.setVisible(true);
-                        textField9.setVisible(true);
-                    } else if (selectedAction.equals("Delete")) {
-                        textField1.setVisible(false);
-                        textField2.setVisible(true);
-                        textField3.setVisible(false);
-                        textField4.setVisible(false);
-                        textField5.setVisible(false);
-                        textField6.setVisible(false);
-                        textField7.setVisible(false);
-                        textField8.setVisible(false);
-                        textField9.setVisible(false);
-                    } else {
-                        // Handle other actions if needed
-                    }
-                    revalidate();
-                    repaint();
-                }
-            });
+        return panel;
+    }
 
-            // Add components based on the selected action
-            add(new JLabel("Modify Line:"));
-            add(textField1);
-            add(new JLabel("Line Name:"));
-            add(textField2);
-            add(new JLabel("Start Time:"));
-            add(textField3);
-            add(new JLabel("End Time:"));
-            add(textField4);
-            add(new JLabel("Intro:"));
-            add(textField5);
-            add(new JLabel("Mileage:"));
-            add(textField6);
-            add(new JLabel("Color:"));
-            add(textField7);
-            add(new JLabel("First Opening:"));
-            add(textField8);
-            add(new JLabel("URL:"));
-            add(textField9);
+    private static JPanel createDeletePanel() {
+        JPanel panel = new JPanel();
+        GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
 
+        JLabel lineNameLabel = new JLabel("Line Name:");
+        JTextField lineNameField = new JTextField(20);
+        JButton confirmDeleteButton = new JButton("Confirm");
 
-            // Confirmation button
-            confirmButton = new JButton("Confirm");
-            add(confirmButton);
-            exitButton = new JButton("Exit");
-            add(exitButton);
+        layout.setHorizontalGroup(layout.createSequentialGroup()
+                .addComponent(lineNameLabel)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(lineNameField)
+                        .addComponent(confirmDeleteButton)));
 
-            confirmButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    String selectedAction = (String) actionComboBox.getSelectedItem();
-                    String modifyLine = textField1.getText();
-                    String lineName = textField2.getText();
-                    String startTime = textField3.getText();
-                    String endTime = textField4.getText();
-                    String intro = textField5.getText();
-                    String mileage = textField6.getText();
-                    String color = textField7.getText();
-                    String firstOpening = textField8.getText();
-                    String url = textField9.getText();
-                    switch (selectedAction) {
-                        case "Insert":
-                            String infoInsert = DbCtrl.insertLine(new DbCtrl.Line(lineName, startTime, endTime, intro, mileage, color, firstOpening, url));
-                            JOptionPane.showMessageDialog(null, infoInsert);
-                            break;
-                        case "Modify":
-                            String infoModify = DbCtrl.modifyLine(modifyLine, new DbCtrl.Line(lineName, startTime, endTime, intro, mileage, color, firstOpening, url));
-                            JOptionPane.showMessageDialog(null, infoModify);
-                            break;
-                        case "Delete":
-                            String infoDelete = DbCtrl.deleteLine(lineName);
-                            JOptionPane.showMessageDialog(null, infoDelete);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            });
-        }
+        layout.setVerticalGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(lineNameLabel)
+                        .addComponent(lineNameField))
+                .addComponent(confirmDeleteButton));
+
+        confirmDeleteButton.addActionListener(e -> {
+            String lineName = lineNameField.getText();
+            String result = DbCtrl.deleteLine(lineName);
+            JOptionPane.showMessageDialog(null, result);
+        });
+
+        return panel;
     }
 
 }

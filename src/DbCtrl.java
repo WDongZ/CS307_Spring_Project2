@@ -14,7 +14,7 @@ public class DbCtrl {
         conn.close();
     }
     static String insertStation(Station station){
-        String sql = "insert into station (district, intro, chinese_name, english_name) values (?, ?, ?, ?)";
+        String sql = "insert into station (district, intro, chinese_name, english_name, status) values (?, ?, ?, ?, ?)";
         try {
             Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -22,6 +22,7 @@ public class DbCtrl {
             ps.setString(2, station.intro);
             ps.setString(3, station.chineseName);
             ps.setString(4, station.englishName);
+            ps.setString(5, station.status);
             ps.executeUpdate();
             ps.close();
             conn.close();
@@ -59,7 +60,7 @@ public class DbCtrl {
 
     static String modifyStation(String modifyStation, Station station){
         String sqlPre = "select count(*) from station where chinese_name = ?";
-        String sql = "update station set district = ?, intro = ?, chinese_name = ?, english_name = ? where chinese_name = ?";
+        String sql = "update station set district = ?, intro = ?, chinese_name = ?, english_name = ?, status = ? where chinese_name = ?";
         try {
             Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
             PreparedStatement psPre = conn.prepareStatement(sqlPre);
@@ -74,7 +75,8 @@ public class DbCtrl {
             ps.setString(2, station.intro);
             ps.setString(3, station.chineseName);
             ps.setString(4, station.englishName);
-            ps.setString(5, modifyStation);
+            ps.setString(5, station.status);
+            ps.setString(6, modifyStation);
             ps.executeUpdate();
             ps.close();
             conn.close();
@@ -632,17 +634,19 @@ public class DbCtrl {
     }
 
     static class Station{
-        public Station(String district, String intro, String chineseName, String englishName) {
+        public Station(String district, String intro, String chineseName, String englishName, String status) {
             this.district = district;
             this.intro = intro;
             this.chineseName = chineseName;
             this.englishName = englishName;
+            this.status = status;
         }
 
         String district;
         String intro;
         String chineseName;
         String englishName;
+        String status;
 
     }
 
