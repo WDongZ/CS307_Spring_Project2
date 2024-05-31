@@ -7,6 +7,7 @@ import model.SearchStation;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.SQLException;
 
 public class UserFrame extends JFrame {
     private JTextArea sqlTextArea;
@@ -14,7 +15,7 @@ public class UserFrame extends JFrame {
 
     public void SubwayManagementUI(LoginFrame.User user) {
         setTitle("深圳地铁管理系统");
-        setSize(800, 500);
+        setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
         setLocation(560, 300);
@@ -77,6 +78,12 @@ public class UserFrame extends JFrame {
         searchPathButton.setBounds(startX, startY + 7 * (buttonHeight + buttonSpacing), buttonWidth, buttonHeight);
         add(searchPathButton);
 
+        JButton searchRideButton = new JButton("查询记录");
+        searchRideButton.setBounds(startX, startY + 8 * (buttonHeight + buttonSpacing), buttonWidth, buttonHeight);
+        add(searchRideButton);
+
+
+
         modifyStationButton.addActionListener(e -> {
             ModifyStations.ModifyStation();
         });
@@ -116,6 +123,11 @@ public class UserFrame extends JFrame {
         modifyPasswordButton.setBounds(200, 20, buttonWidth-20, buttonHeight);
         add(modifyPasswordButton);
         exitButton.addActionListener(e -> {
+            try {
+                DbCtrl.disconnect();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
             System.exit(0);
         });
         setVisible(true);

@@ -14,14 +14,7 @@ public class DbCtrl {
             throw new RuntimeException(e);
         }
     }
-    public static void connect(String user, String password) throws SQLException {
-        String url = "jdbc:postgresql://localhost:5432/project";
-        Connection conn = DriverManager.getConnection(url, user, password);
-        Statement st = conn.createStatement();
-        for (int i = 1; i < 373; i++) {
-            st.executeQuery("update line_station set position = (select rank() over (partition by line_id order by id) from line_station where id = ?) where id = ?;");
-        }
-        st.close();
+    public static void disconnect() throws SQLException {
         conn.close();
     }
     static String insertStation(Station station){
@@ -35,7 +28,6 @@ public class DbCtrl {
             ps.setString(5, station.status);
             ps.executeUpdate();
             ps.close();
-            conn.close();
             return " \" " + station.chineseName + "\" inserted successfully";
         } catch (SQLException e) {
             e.printStackTrace();
@@ -58,7 +50,6 @@ public class DbCtrl {
             ps.setString(1, chineseName);
             ps.executeUpdate();
             ps.close();
-            conn.close();
             rs.close();
             return " \" " + chineseName + "\" deleted successfully";
         } catch (SQLException e) {
@@ -87,7 +78,6 @@ public class DbCtrl {
             ps.setString(6, modifyStation);
             ps.executeUpdate();
             ps.close();
-            conn.close();
             rs.close();
             return " \" " + station.chineseName + "\" modified successfully";
         } catch (SQLException e) {
@@ -110,7 +100,6 @@ public class DbCtrl {
             ps.setString(8, line.url);
             ps.executeUpdate();
             ps.close();
-            conn.close();
             return " \" " + line.lineName + "\" inserted successfully";
         } catch (SQLException e) {
             e.printStackTrace();
@@ -133,7 +122,6 @@ public class DbCtrl {
             }
             ps.executeUpdate();
             ps.close();
-            conn.close();
             rs.close();
             return " \" " + lineName + "\" deleted successfully";
         } catch (SQLException e) {
@@ -165,7 +153,6 @@ public class DbCtrl {
             ps.setString(9, modifyLine);
             ps.executeUpdate();
             ps.close();
-            conn.close();
             rs.close();
             return " \" " + line.lineName + "\" modified successfully";
         } catch (SQLException e) {
@@ -199,7 +186,6 @@ public class DbCtrl {
             ps.setString(3,stationName);
             ps.executeUpdate();
             ps.close();
-            conn.close();
             rs.close();
             rs2.close();
             return " \" " + stationName + "\" inserted into \" " + lineName + "\" successfully";
@@ -233,7 +219,6 @@ public class DbCtrl {
             ps.setString(2,stationName);
             ps.executeUpdate();
             ps.close();
-            conn.close();
             rs.close();
             rs2.close();
             return " \" " + stationName + "\" deleted from \" " + lineName + "\" successfully";
@@ -243,9 +228,9 @@ public class DbCtrl {
         }
     }
 
-    public static String passengerRecord (String stationName, String startTime, String passengerID){
-        String sql = "insert into passenger_on (station_id, start_time, passenger_id) values " +
-                "((select id from station where chinese_name = ?), ?, (select id from passenger where id_number = ?))";
+    public static String passengerRecord (String stationName, String startTime, String passengerID, String carriage){
+        String sql = "insert into passenger_on (station_id, start_time, passenger_id, carriage) values " +
+                "((select id from station where chinese_name = ?), ?, (select id from passenger where id_number = ?), ?)";
         String sqlPre = "select count(*) from station where chinese_name = ?";
         String sqlPre2 = "select count(*) from passenger where id_number = ?";
         try {
@@ -267,9 +252,9 @@ public class DbCtrl {
             ps.setString(1, stationName);
             ps.setTimestamp(2, Timestamp.valueOf(startTime));
             ps.setString(3, passengerID);
+            ps.setString(4, carriage);
             ps.executeUpdate();
             ps.close();
-            conn.close();
             rs.close();
             rs2.close();
             return "Passenger " + passengerID + " recorded at " + stationName + " at " + startTime;
@@ -279,8 +264,8 @@ public class DbCtrl {
         }
     }
 
-    public static String cardRecord (String stationName, String startTime, String cardID){
-        String sql = "insert into card_on (station_id, start_time, card_id) values ((select id from station where chinese_name = ?), ?, (select id from card where code = ?))";
+    public static String cardRecord (String stationName, String startTime, String cardID, String carriage){
+        String sql = "insert into card_on (station_id, start_time, card_id) values ((select id from station where chinese_name = ?), ?, (select id from card where code = ?), ?)";
         String sqlPre = "select count(*) from station where chinese_name = ?";
         String sqlPre2 = "select count(*) from card where code = ?";
         try {
@@ -302,9 +287,9 @@ public class DbCtrl {
             ps.setString(1, stationName);
             ps.setTimestamp(2, Timestamp.valueOf(startTime));
             ps.setString(3, cardID);
+            ps.setString(4, carriage);
             ps.executeUpdate();
             ps.close();
-            conn.close();
             rs.close();
             rs2.close();
             return "Card " + cardID + " recorded at " + stationName + " at " + startTime;
@@ -319,7 +304,8 @@ public class DbCtrl {
         String getEndStationId = "select id from station where chinese_name = ?";
         String getStartTime = "select start_time from card_on where card_id = (select id from card where code = ?)";
         String getPrice = "select price from price where start_station = ? and end_station = ?";
-        String sql = "insert into ride (start_station_id, end_station_id,price, start_time, end_time) values (?, ?, ?, ?, ?) returning id";
+        String getCarriage = "select carriage from card_on where card_id = (select id from card where code = ?)";
+        String sql = "insert into ride (start_station_id, end_station_id,price, start_time, end_time, carriage) values (?, ?, ?, ?, ?, ?) returning id";
         String sql2 = "insert into card_ride (card_id, ride_id) values ((select id from card where code = ?), ?)";
         String sqlPre = "select count(*) from station where chinese_name = ?";
         String sqlPre2 = "select count(*) from card where code = ?";
@@ -328,6 +314,7 @@ public class DbCtrl {
             PreparedStatement psGetEndStationId = conn.prepareStatement(getEndStationId);
             PreparedStatement psGetStartTime = conn.prepareStatement(getStartTime);
             PreparedStatement psGetPrice = conn.prepareStatement(getPrice);
+            PreparedStatement psGetCarriage = conn.prepareStatement(getCarriage);
             PreparedStatement ps = conn.prepareStatement(sql);
             PreparedStatement ps2 = conn.prepareStatement(sql2);
             PreparedStatement psPre = conn.prepareStatement(sqlPre);
@@ -361,11 +348,19 @@ public class DbCtrl {
             ResultSet rsGetPrice = psGetPrice.executeQuery();
             rsGetPrice.next();
             double price = rsGetPrice.getDouble(1);
+            psGetCarriage.setString(1, cardID);
+            ResultSet rsGetCarriage = psGetCarriage.executeQuery();
+            rsGetCarriage.next();
+            String carriage = rsGetCarriage.getString(1);
+            if (carriage.equals("business")) {
+                price *= 2;
+            }
             ps.setInt(1, startStationId);
             ps.setInt(2, endStationId);
             ps.setDouble(3, price);
             ps.setTimestamp(4, startTime);
             ps.setTimestamp(5, Timestamp.valueOf(time));
+            ps.setString(6, carriage);
             ResultSet rideId = ps.executeQuery();
             rideId.next();
             int id = rideId.getInt(1);
@@ -378,7 +373,6 @@ public class DbCtrl {
             psGetPrice.close();
             ps.close();
             ps2.close();
-            conn.close();
             rs.close();
             rs2.close();
             rideId.close();
@@ -386,7 +380,7 @@ public class DbCtrl {
             rsGetEndStationId.close();
             rsGetStartTime.close();
             rsGetPrice.close();
-            return "Card " + cardID + " recorded out at " + stationName + " at " + time + " with price " + price;
+            return "Card " + cardID + " recorded out at " + stationName + " at " + time + " with price " + price + " and carriage " + carriage;
         } catch (SQLException e) {
             e.printStackTrace();
             return e.getSQLState() + ": " + e.getMessage();
@@ -398,7 +392,8 @@ public class DbCtrl {
         String getEndStationId = "select id from station where chinese_name = ?";
         String getStartTime = "select start_time from passenger_on where passenger_id = (select id from passenger where id_number = ?)";
         String getPrice = "select price from price where start_station = ? and end_station = ?";
-        String sql = "insert into ride (start_station_id, end_station_id,price, start_time, end_time) values (?, ?, ?, ?, ?) returning id";
+        String getCarriage = "select carriage from passenger_on where passenger_id = (select id from passenger where id_number = ?)";
+        String sql = "insert into ride (start_station_id, end_station_id,price, start_time, end_time, carriage) values (?, ?, ?, ?, ?, ?) returning id";
         String sql2 = "insert into passenger_ride (passenger_id, ride_id) values ((select id from passenger where id_number = ?), ?)";
         String sqlPre = "select count(*) from station where chinese_name = ?";
         String sqlPre2 = "select count(*) from passenger where id_number = ?";
@@ -408,6 +403,7 @@ public class DbCtrl {
             PreparedStatement psGetEndStationId = conn.prepareStatement(getEndStationId);
             PreparedStatement psGetStartTime = conn.prepareStatement(getStartTime);
             PreparedStatement psGetPrice = conn.prepareStatement(getPrice);
+            PreparedStatement psGetCarriage = conn.prepareStatement(getCarriage);
             PreparedStatement ps = conn.prepareStatement(sql);
             PreparedStatement ps2 = conn.prepareStatement(sql2);
             PreparedStatement psPre = conn.prepareStatement(sqlPre);
@@ -448,11 +444,19 @@ public class DbCtrl {
             ResultSet rsGetPrice = psGetPrice.executeQuery();
             rsGetPrice.next();
             double price = rsGetPrice.getDouble(1);
+            psGetCarriage.setString(1, passengerID);
+            ResultSet rsGetCarriage = psGetCarriage.executeQuery();
+            rsGetCarriage.next();
+            String carriage = rsGetCarriage.getString(1);
+            if (carriage.equals("business")) {
+                price *= 2;
+            }
             ps.setInt(1, startStationId);
             ps.setInt(2, endStationId);
             ps.setDouble(3, price);
             ps.setTimestamp(4, startTime);
             ps.setTimestamp(5, Timestamp.valueOf(time));
+            ps.setString(6, carriage);
             ResultSet rideId = ps.executeQuery();
             rideId.next();
             int id = rideId.getInt(1);
@@ -465,7 +469,6 @@ public class DbCtrl {
             psGetPrice.close();
             ps.close();
             ps2.close();
-            conn.close();
             rs.close();
             rs2.close();
             rs3.close();
@@ -474,7 +477,7 @@ public class DbCtrl {
             rsGetEndStationId.close();
             rsGetStartTime.close();
             rsGetPrice.close();
-            return "Card " + passengerID + " recorded out at " + stationName + " at " + time + " with price " + price;
+            return "Card " + passengerID + " recorded out at " + stationName + " at " + time + " with price " + price + " and carriage " + carriage;
         } catch (SQLException e) {
             e.printStackTrace();
             return e.getSQLState() + ": " + e.getMessage();
@@ -492,7 +495,6 @@ public class DbCtrl {
             }
             rs.close();
             st.close();
-            conn.close();
             return result;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -527,7 +529,6 @@ public class DbCtrl {
             String result = resultSet.getString(1);
             resultSet.close();
             ps.close();
-            conn.close();
             rs1.close();
             rs2.close();
             return result;
@@ -548,7 +549,6 @@ public class DbCtrl {
             }
             rs.close();
             st.close();
-            conn.close();
             return result;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -616,7 +616,6 @@ public class DbCtrl {
             }
             resultSet.close();
             ps.close();
-            conn.close();
             rs.close();
             rs2.close();
             rs3.close();

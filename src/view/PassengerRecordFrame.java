@@ -31,17 +31,29 @@ public class PassengerRecordFrame {
         JButton confirmButton = new JButton("Confirm");
         JButton exitButton = new JButton("Exit");
 
+        JLabel carriageLabel = new JLabel("Carriage:");
+        JRadioButton normalButton = new JRadioButton("normal");
+        JRadioButton businessButton = new JRadioButton("business");
+        ButtonGroup statusGroup = new ButtonGroup();
+        statusGroup.add(normalButton);
+        statusGroup.add(businessButton);
+
         layout.setHorizontalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                 .addComponent(idCardRadioButton)
                                 .addComponent(stationLabel)
                                 .addComponent(IDLabel)
+                                .addComponent(carriageLabel)
                         )
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                 .addComponent(travelCardRadioButton)
                                 .addComponent(stationTextField)
                                 .addComponent(IDTextField)
+                                .addGroup(layout.createSequentialGroup()
+                                        .addComponent(normalButton)
+                                        .addComponent(businessButton)
+                                )
                                 .addComponent(confirmButton)
                                 .addComponent(exitButton)
                         )
@@ -58,6 +70,10 @@ public class PassengerRecordFrame {
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(IDLabel)
                                 .addComponent(IDTextField))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(carriageLabel)
+                                .addComponent(normalButton)
+                                .addComponent(businessButton))
                         .addComponent(confirmButton)
                         .addComponent(exitButton)
         );
@@ -66,14 +82,15 @@ public class PassengerRecordFrame {
             String cardType = idCardRadioButton.isSelected() ? "Passenger ID" : "Card ID";
             String station = stationTextField.getText();
             String ID = IDTextField.getText();
+            String carriage = normalButton.isSelected() ? "normal" : "business";
             Date date = new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String time = sdf.format(date);
             if (cardType.equals("Passenger ID")) {
-                String psInfo = DbCtrl.passengerRecord(station, time, ID);
+                String psInfo = DbCtrl.passengerRecord(station, time, ID, carriage);
                 JOptionPane.showMessageDialog(null, psInfo);
             } else {
-                String cdInfo = DbCtrl.cardRecord(station, time, ID);
+                String cdInfo = DbCtrl.cardRecord(station, time, ID, carriage);
                 JOptionPane.showMessageDialog(null, cdInfo);
             }
         });
