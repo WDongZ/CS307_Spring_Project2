@@ -1,5 +1,6 @@
 package model;
 
+import java.lang.reflect.Array;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
@@ -307,6 +308,7 @@ public class DbCtrl {
         String getCarriage = "select carriage from card_on where card_id = (select id from card where code = ?)";
         String sql = "insert into ride (start_station_id, end_station_id,price, start_time, end_time, carriage) values (?, ?, ?, ?, ?, ?) returning id";
         String sql2 = "insert into card_ride (card_id, ride_id) values ((select id from card where code = ?), ?)";
+        String sql3 = "update card set money = money - ? where code = ?";
         String sqlPre = "select count(*) from station where chinese_name = ?";
         String sqlPre2 = "select count(*) from card where code = ?";
         try {
@@ -317,6 +319,7 @@ public class DbCtrl {
             PreparedStatement psGetCarriage = conn.prepareStatement(getCarriage);
             PreparedStatement ps = conn.prepareStatement(sql);
             PreparedStatement ps2 = conn.prepareStatement(sql2);
+            PreparedStatement ps3 = conn.prepareStatement(sql3);
             PreparedStatement psPre = conn.prepareStatement(sqlPre);
             PreparedStatement psPre2 = conn.prepareStatement(sqlPre2);
             psPre.setString(1, stationName);
@@ -367,12 +370,17 @@ public class DbCtrl {
             ps2.setString(1, cardID);
             ps2.setInt(2, id);
             ps2.executeUpdate();
+            ps3.setDouble(1, price);
+            ps3.setString(2, cardID);
+            ps3.executeUpdate();
             psGetStartStationId.close();
             psGetEndStationId.close();
             psGetStartTime.close();
             psGetPrice.close();
+            psGetCarriage.close();
             ps.close();
             ps2.close();
+            ps3.close();
             rs.close();
             rs2.close();
             rideId.close();
@@ -380,6 +388,7 @@ public class DbCtrl {
             rsGetEndStationId.close();
             rsGetStartTime.close();
             rsGetPrice.close();
+            rsGetCarriage.close();
             return "Card " + cardID + " recorded out at " + stationName + " at " + time + " with price " + price + " and carriage " + carriage;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -549,6 +558,67 @@ public class DbCtrl {
             }
             rs.close();
             st.close();
+            return result;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            result.add(e.getSQLState() + ": " + e.getMessage());
+            return result;
+        }
+    }
+
+    public static ArrayList<String> queryPassengerRide (String name, String phoneNumber, String gender, String district, String idNumber, String startTime, String endTime, String carriage, String startStation, String endStation) {
+        StringBuilder sqlBd = new StringBuilder("select * from pr_v where true");
+        String getStationId = "select id from station where chinese_name = ?";
+        String getStation = "select chinese_name from station where id = ?";
+        if (!name.equals("null")) sqlBd.append(" and name = '").append(name).append("'" );
+        if (!phoneNumber.equals("null")) sqlBd.append(" and phone_number = '").append(phoneNumber).append("'");
+        if (!gender.equals("null")) sqlBd.append(" and gender = '").append(gender).append("'");
+        if (!district.equals("null")) sqlBd.append(" and district = '").append(district).append("'");
+        if (!idNumber.equals("null")) sqlBd.append(" and id_number = '").append(idNumber).append("'");
+        if (!startTime.equals("null")) sqlBd.append(" and start_time >= '").append(startTime).append("'");
+        if (!endTime.equals("null")) sqlBd.append(" and end_time <= '").append(endTime).append("'");
+        if (!carriage.equals("null")) sqlBd.append(" and carriage = '").append(carriage).append("'");
+        ArrayList<String> result = new ArrayList<>();
+        try {
+            PreparedStatement psGetStartStationId = conn.prepareStatement(getStationId);
+            PreparedStatement psGetEndStationId = conn.prepareStatement(getStationId);
+            psGetStartStationId.setString(1, startStation);
+            psGetEndStationId.setString(1, endStation);
+            ResultSet rsGetStartStationId = psGetStartStationId.executeQuery();
+            ResultSet rsGetEndStationId = psGetEndStationId.executeQuery();
+            rsGetStartStationId.next();
+            rsGetEndStationId.next();
+            if (!startStation.equals("null")) {
+                int startStationId = rsGetStartStationId.getInt(1);
+                sqlBd.append(" and start_station_id = ").append(startStationId);
+            }
+            if (!endStation.equals("null")){
+                int endStationId = rsGetEndStationId.getInt(1);
+                sqlBd.append(" and end_station_id = ").append(endStationId);
+            }
+            String sql = sqlBd.toString();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                PreparedStatement psGetStartStation = conn.prepareStatement(getStation);
+                PreparedStatement psGetEndStation = conn.prepareStatement(getStation);
+                psGetStartStation.setInt(1, rs.getInt(6));
+                psGetEndStation.setInt(1, rs.getInt(7));
+                ResultSet rsGetStartStation = psGetStartStation.executeQuery();
+                ResultSet rsGetEndStation = psGetEndStation.executeQuery();
+                rsGetStartStation.next();
+                rsGetEndStation.next();
+                result.add(rs.getString(1) + "  " + rs.getString(2) + "  " + rs.getString(3)
+                        + "  " + rs.getString(4) + "  " + rs.getString(5) + "  " + rsGetStartStation.getString(1)
+                        + "  " + rsGetEndStation.getString(1) + "  " + rs.getString(8) + "  " + rs.getString(9)
+                        + "  " + rs.getString(10)+ "  " + rs.getString(11));
+            }
+            rs.close();
+            ps.close();
+            rsGetStartStationId.close();
+            rsGetEndStationId.close();
+            psGetStartStationId.close();
+            psGetEndStationId.close();
             return result;
         } catch (SQLException e) {
             e.printStackTrace();

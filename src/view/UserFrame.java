@@ -116,6 +116,10 @@ public class UserFrame extends JFrame {
             QueryPathFrame.showPathQuery();
         });
 
+        searchRideButton.addActionListener(e -> {
+            new QueryRideFrame();
+        });
+
         JButton exitButton = new JButton("退出");
         exitButton.setBounds(350, 20, buttonWidth/2-10, buttonHeight);
         add(exitButton);
