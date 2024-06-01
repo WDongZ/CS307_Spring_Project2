@@ -7,6 +7,7 @@ public class ModifyLines {
     public static void ModifyLine() {
         JFrame frame = new JFrame("Modify Lines");
         frame.setSize(600, 400);
+        frame.setLocation(560, 300);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Create a tabbed pane

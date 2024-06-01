@@ -101,6 +101,7 @@ public class PassengerRecordFrame {
 
         frame.add(recordPanel);
         frame.setSize(600, 400);
+        frame.setLocation(560, 300);
         frame.setVisible(true);
     }
 }  

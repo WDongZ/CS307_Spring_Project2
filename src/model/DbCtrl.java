@@ -726,6 +726,56 @@ public class DbCtrl {
         }
     }
 
+    public static ArrayList<String> queryCardRide(String code, String startStationC, String endStationC, String startTimeC, String endTimeC, String carriageC) {
+        StringBuilder sqlBd = new StringBuilder("select * from cr_v where true");
+        String getStationId = "select id from station where chinese_name = ?";
+        String getStation = "select chinese_name from station where id = ?";
+        if (!code.equals("null")) sqlBd.append(" and code = '").append(code).append("'" );
+        if (!startStationC.equals("null")) sqlBd.append(" and start_station_id = (select id from station where chinese_name = '").append(startStationC).append("')");
+        if (!endStationC.equals("null")) sqlBd.append(" and end_station_id = (select id from station where chinese_name = '").append(endStationC).append("')");
+        if (!startTimeC.equals("null")) sqlBd.append(" and start_time >= '").append(startTimeC).append("'");
+        if (!endTimeC.equals("null")) sqlBd.append(" and end_time <= '").append(endTimeC).append("'");
+        if (!carriageC.equals("null")) sqlBd.append(" and carriage = '").append(carriageC).append("'");
+        ArrayList<String> result = new ArrayList<>();
+        try {
+            PreparedStatement psGetStartStationId = conn.prepareStatement(getStationId);
+            PreparedStatement psGetEndStationId = conn.prepareStatement(getStationId);
+            psGetStartStationId.setString(1, startStationC);
+            psGetEndStationId.setString(1, endStationC);
+            ResultSet rsGetStartStationId = psGetStartStationId.executeQuery();
+            ResultSet rsGetEndStationId = psGetEndStationId.executeQuery();
+            rsGetStartStationId.next();
+            rsGetEndStationId.next();
+            String sql = sqlBd.toString();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                PreparedStatement psGetStartStation = conn.prepareStatement(getStation);
+                PreparedStatement psGetEndStation = conn.prepareStatement(getStation);
+                psGetStartStation.setInt(1, rs.getInt(2));
+                psGetEndStation.setInt(1, rs.getInt(3));
+                ResultSet rsGetStartStation = psGetStartStation.executeQuery();
+                ResultSet rsGetEndStation = psGetEndStation.executeQuery();
+                rsGetStartStation.next();
+                rsGetEndStation.next();
+                result.add(rs.getString(1) + "  " + rsGetStartStation.getString(1)
+                        + "  " + rsGetEndStation.getString(1) + "  " + rs.getString(4) + "  "
+                        + rs.getString(5) + "  " + "  " + rs.getString(6) + "  " + rs.getString(7));
+            }
+            rs.close();
+            ps.close();
+            rsGetStartStationId.close();
+            rsGetEndStationId.close();
+            psGetStartStationId.close();
+            psGetEndStationId.close();
+            return result;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            result.add(e.getSQLState() + ": " + e.getMessage());
+            return result;
+        }
+    }
+
     static class Station{
         public Station(String district, String intro, String chineseName, String englishName, String status) {
             this.district = district;

@@ -30,6 +30,14 @@ public class StationLineFrame {
         JButton confirmButton = new JButton("Confirm");
         JButton exitButton = new JButton("Exit");
 
+        deleteRadioButton.addActionListener(e -> {
+            stationPosition.setEditable(false);
+        });
+
+        addRadioButton.addActionListener(e -> {
+            stationPosition.setEditable(true);
+        });
+
         layout.setHorizontalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -84,6 +92,7 @@ public class StationLineFrame {
 
         frame.add(operationPanel);
         frame.setSize(600, 400);
+        frame.setLocation(560, 300);
         frame.setVisible(true);
     }
 

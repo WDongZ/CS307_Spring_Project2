@@ -7,6 +7,7 @@ public class ModifyStations {
     public static void ModifyStation() {
         JFrame frame = new JFrame("Modify Stations");
         frame.setSize(600, 400);
+        frame.setLocation(560, 300);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Create a tabbed pane
@@ -111,7 +112,7 @@ public class ModifyStations {
             String englishName = englishNameField.getText();
             String chineseName = chineseNameField.getText();
             String status = operatingButton.isSelected() ? "运营中" : constructingButton.isSelected() ? "建设中" : "关闭中";
-            String result = DbCtrl.modifyStation(stationName, new DbCtrl.Station(district, intro, englishName, chineseName, status));
+            String result = DbCtrl.modifyStation(stationName, new DbCtrl.Station(district, intro, chineseName, englishName, status));
             JOptionPane.showMessageDialog(null, result);
         });
 
@@ -188,7 +189,7 @@ public class ModifyStations {
             String englishName = englishNameField.getText();
             String chineseName = chineseNameField.getText();
             String status = operatingButton.isSelected() ? "运营中" : constructingButton.isSelected() ? "建设中" : "关闭中";
-            String result = DbCtrl.insertStation(new DbCtrl.Station(district, intro, englishName, chineseName, status));
+            String result = DbCtrl.insertStation(new DbCtrl.Station(district, intro, chineseName, englishName, status));
             JOptionPane.showMessageDialog(null, result);
         });
 
@@ -227,7 +228,4 @@ public class ModifyStations {
         return panel;
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(ModifyStations::ModifyStation);
-    }
 }

@@ -43,6 +43,7 @@ public class PassengerQueryFrame extends JFrame {
 
         add(tabbedPane);
         add(buttonPanel, BorderLayout.SOUTH);
+        setLocation(560, 300);
 
         setVisible(true);
     }

@@ -15,12 +15,13 @@ public class QueryRideFrame extends JFrame {
     public QueryRideFrame() {
         setTitle("Query Ride Frame");
         setSize(600, 800);
+        setLocation(560, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));  // Add padding between components
 
         // Create components
-        String[] queryTypes = {"card", "passenger", "all"};
+        String[] queryTypes = {"card", "passenger"};
         queryTypeComboBox = new JComboBox<>(queryTypes);
         queryPanel = new JPanel(new GridBagLayout());
         queryPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -82,13 +83,6 @@ public class QueryRideFrame extends JFrame {
                     addQueryField("End Time", 8);
                     addQueryField("Carriage", 9);
                     break;
-                case "all":
-                    addQueryField("Start Station", 0);
-                    addQueryField("End Station", 1);
-                    addQueryField("Start Time", 2);
-                    addQueryField("End Time", 3);
-                    addQueryField("Carriage", 4);
-                    break;
             }
         }
         queryPanel.revalidate();
@@ -122,7 +116,16 @@ public class QueryRideFrame extends JFrame {
         if (selectedType != null) {
             switch (selectedType) {
                 case "card":
-                    // Perform card query
+                    String code = queryPanel.getComponent(1).isEnabled() ? ((JTextField) queryPanel.getComponent(1)).getText() : "null";
+                    String startStation_c = queryPanel.getComponent(3).isEnabled() ? ((JTextField) queryPanel.getComponent(3)).getText() : "null";
+                    String endStation_c = queryPanel.getComponent(5).isEnabled() ? ((JTextField) queryPanel.getComponent(5)).getText() : "null";
+                    String startTime_c = queryPanel.getComponent(7).isEnabled() ? ((JTextField) queryPanel.getComponent(7)).getText() : "null";
+                    String endTime_c = queryPanel.getComponent(9).isEnabled() ? ((JTextField) queryPanel.getComponent(9)).getText() : "null";
+                    String carriage_c = queryPanel.getComponent(11).isEnabled() ? ((JTextField) queryPanel.getComponent(11)).getText() : "null";
+                    ArrayList<String> data_c = DbCtrl.queryCardRide(code, startStation_c, endStation_c, startTime_c, endTime_c, carriage_c);
+                    for (String s : data_c) {
+                        resultListModel.addElement(s);
+                    }
                     break;
                 case "passenger":
                     String name = queryPanel.getComponent(1).isEnabled() ? ((JTextField) queryPanel.getComponent(1)).getText() : "null";
@@ -139,9 +142,6 @@ public class QueryRideFrame extends JFrame {
                     for (String s : data) {
                         resultListModel.addElement(s);
                     }
-                    break;
-                case "all":
-                    // Perform all query
                     break;
             }
         }

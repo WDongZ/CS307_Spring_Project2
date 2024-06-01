@@ -22,6 +22,8 @@ public class QueryPathFrame {
         JButton confirmButton = new JButton("Confirm");
         JButton exitButton = new JButton("Exit");
         JTextArea resultTextArea = new JTextArea(10, 30);
+        resultTextArea.setLineWrap(true);
+        resultTextArea.setWrapStyleWord(true);
         resultTextArea.setEditable(false);
 
         layout.setHorizontalGroup(
@@ -63,7 +65,8 @@ public class QueryPathFrame {
         });
 
         frame.add(operationPanel);
-        frame.setSize(1500, 400);
+        frame.setSize(800, 400);
+        frame.setLocation(560, 300);
         frame.setVisible(true);
     }
 }
