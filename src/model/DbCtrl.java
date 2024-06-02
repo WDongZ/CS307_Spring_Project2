@@ -547,6 +547,33 @@ public class DbCtrl {
         }
     }
 
+    public static ArrayList<String> queryBus (String station) {
+        String sql = "select bus_name, bus_stop_name from bus_v where chinese_name = '" + station + "'" + "order by bus_stop_name";
+        String sqlPre = "select count(*) from station where chinese_name = ?";
+        ArrayList<String> result = new ArrayList<>();
+        try {
+            PreparedStatement psPre = conn.prepareStatement(sqlPre);
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            psPre.setString(1, station);
+            ResultSet rs1 = psPre.executeQuery();
+            rs1.next();
+            if (rs1.getInt(1) == 0) {
+                result.add(" \" " + station + "\"  not found");
+                return result;
+            }
+            while (rs.next()) {
+                result.add(rs.getString(1) + "  " + rs.getString(2));
+            }
+            rs.close();
+            st.close();
+            return result;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            result.add(e.getSQLState() + ": " + e.getMessage());
+            return result;
+        }
+    }
     public static ArrayList<String> queryCard () {
         String sql = "select code, money, create_time from card where id in (select card_id from card_on)";
         ArrayList<String> result = new ArrayList<>();
