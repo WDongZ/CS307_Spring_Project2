@@ -1,7 +1,11 @@
 package view;
 
+import model.DbCtrl;
+
 import javax.swing.*;
 import java.awt.*;
+import java.sql.SQLException;
+import java.util.Objects;
 
 public class LoginFrame extends JFrame{
     public static void login() {
@@ -34,9 +38,13 @@ public class LoginFrame extends JFrame{
         passwordText.setBounds(110, 85, 200, 30);
         panel.add(passwordText);
         JButton loginButton = new JButton("登录");
-        loginButton.setBounds(130, 140, 120, 40);
-        loginButton.setFont(new Font("Rockwell", Font.BOLD, 16));
+        loginButton.setBounds(40, 140, 120, 40);
+        loginButton.setFont(new Font("宋体", Font.BOLD, 16));
         panel.add(loginButton);
+        JButton regButton = new JButton("注册");
+        regButton.setBounds(200, 140, 120, 40);
+        regButton.setFont(new Font("宋体", Font.BOLD, 16));
+        panel.add(regButton);
     }
 
     private static void waitForLogin(JPanel panel, JFrame frame) {
@@ -44,21 +52,31 @@ public class LoginFrame extends JFrame{
         loginButton.addActionListener(e -> {
             String username = ((JTextField)panel.getComponent(1)).getText();
             String password = ((JPasswordField)panel.getComponent(3)).getText();
-//            if (username.equals("")){
-//                JOptionPane.showMessageDialog(null, createMessage("请输入账户"), "错误", JOptionPane.ERROR_MESSAGE);
-//                return;
-//            } else if (password.length() == 0){
-//                JOptionPane.showMessageDialog(null, createMessage("请输入密码"), "错误", JOptionPane.ERROR_MESSAGE);
-//                return;
-//            }
-            if (username.equals("") && password.equals("")) {
-                User u = new User(username, password, Role.ADMIN);
-                JOptionPane.showMessageDialog(null, createMessage("登录成功！"));
-                frame.setVisible(false);
-                UserFrame userFrame = new UserFrame();
-                userFrame.SubwayManagementUI(u);
-            } else {
-                JOptionPane.showMessageDialog(null, createMessage("登录失败！"));
+            try {
+                String role = DbCtrl.login(username, password);
+                if (Objects.equals(role, "null")) {
+                    JOptionPane.showMessageDialog(null, "用户名或密码错误", "错误", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, "登录成功", "成功", JOptionPane.INFORMATION_MESSAGE);
+                    User user = new User(username, password, Role.valueOf(role));
+                    DbCtrl.getConnect(user);
+                    frame.setVisible(false);
+                    UserFrame userFrame = new UserFrame();
+                    userFrame.SubwayManagementUI(user);
+                }
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        JButton regButton = (JButton) panel.getComponent(5);
+        regButton.addActionListener(e -> {
+            String username = ((JTextField)panel.getComponent(1)).getText();
+            String password = ((JPasswordField)panel.getComponent(3)).getText();
+            try {
+                String result = DbCtrl.register(username, password);
+                JOptionPane.showMessageDialog(null, result);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
             }
         });
     }

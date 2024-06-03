@@ -13,6 +13,7 @@ public class UserFrame extends JFrame {
     private JTextArea sqlTextArea;
     private JTextArea resultTextArea;
 
+
     public void SubwayManagementUI(LoginFrame.User user) {
         Font font = new Font("微软雅黑", Font.PLAIN, 12);
         setTitle("深圳地铁管理系统");
@@ -123,15 +124,18 @@ public class UserFrame extends JFrame {
 
 
         modifyStationButton.addActionListener(e -> {
-            ModifyStations.ModifyStation();
+            if (user.getRole().equals("ADMIN")) ModifyStations.ModifyStation();
+            else JOptionPane.showMessageDialog(null, "您没有权限修改地铁信息");
         });
 
         modifyLineButton.addActionListener(e -> {
-            ModifyLines.ModifyLine();
+            if (user.getRole().equals("ADMIN")) ModifyLines.ModifyLine();
+            else JOptionPane.showMessageDialog(null, "您没有权限修改地铁信息");
         });
 
         modifyStationAndLineButton.addActionListener(e -> {
-            StationLineFrame.showStationLine();
+            if (user.getRole().equals("ADMIN")) StationLineFrame.showStationLine();
+            else JOptionPane.showMessageDialog(null, "您没有权限修改地铁信息");
         });
 
         searchStationButton.addActionListener(e -> {
@@ -147,7 +151,8 @@ public class UserFrame extends JFrame {
         });
 
         searchPassengerButton.addActionListener(e -> {
-            new PassengerQueryFrame();
+            if (user.getRole().equals("ADMIN")) new PassengerQueryFrame();
+            else JOptionPane.showMessageDialog(null, "您没有权限查询乘客信息");
         });
 
         searchPathButton.addActionListener(e -> {
@@ -155,7 +160,8 @@ public class UserFrame extends JFrame {
         });
 
         searchRideButton.addActionListener(e -> {
-            new QueryRideFrame();
+            if (user.getRole().equals("ADMIN")) new QueryRideFrame();
+            else JOptionPane.showMessageDialog(null, "您没有权限查询乘车记录");
         });
 
         searchBusButton.addActionListener(e -> {
@@ -175,6 +181,9 @@ public class UserFrame extends JFrame {
         modifyPasswordButton.setBackground(Color.getHSBColor(0.45f, 0.8f, 0.6f));
         modifyPasswordButton.setForeground(Color.white);
         add(modifyPasswordButton);
+        modifyPasswordButton.addActionListener(e -> {
+            ModifyPasswordFrame.showModifyPassword(user);
+        });
         exitButton.addActionListener(e -> {
             try {
                 DbCtrl.disconnect();

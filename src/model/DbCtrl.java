@@ -1,5 +1,7 @@
 package model;
 
+import view.LoginFrame;
+
 import java.lang.reflect.Array;
 import java.sql.*;
 import java.sql.Date;
@@ -8,9 +10,9 @@ import java.util.*;
 public class DbCtrl {
     private static Connection conn;
 
-    static {
+    public static void getConnect(LoginFrame.User user){
         try {
-            conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
+            conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", user.username, user.password);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -18,6 +20,42 @@ public class DbCtrl {
     public static void disconnect() throws SQLException {
         conn.close();
     }
+
+    public static String login (String username, String password) throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
+        String sql = "select role from \"user\" where username = ? and password = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString(1);
+            } else {
+                return "null";
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return e.getSQLState() + ": " + e.getMessage();
+        }
+    }
+
+    public static String register (String username, String password) throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "checker", "123456");
+        String sql = "insert into \"user\" (username, password, role) values (?, ?, 'USER')";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ps.executeUpdate();
+            return "Register successfully";
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return e.getSQLState() + ": " + e.getMessage();
+        }
+    }
+
+
     static String insertStation(Station station){
         String sql = "insert into station (district, intro, chinese_name, english_name, status) values (?, ?, ?, ?, ?)";
         try {
@@ -39,15 +77,19 @@ public class DbCtrl {
     static String deleteStation(String chineseName){
         String sqlPre = "select count(*) from station where chinese_name = ?";
         String sql = "delete from station where chinese_name = ?";
+        String sql2 = "delete from line_station where station_id = (select id from station where chinese_name = ?)";
         try {
             PreparedStatement psPre = conn.prepareStatement(sqlPre);
             PreparedStatement ps = conn.prepareStatement(sql);
+            PreparedStatement ps2 = conn.prepareStatement(sql2);
             psPre.setString(1, chineseName);
             ResultSet rs = psPre.executeQuery();
             rs.next();
             if (rs.getInt(1) == 0) {
                 return " \" " + chineseName + "\" not found";
             }
+            ps2.setString(1, chineseName);
+            ps2.executeUpdate();
             ps.setString(1, chineseName);
             ps.executeUpdate();
             ps.close();
@@ -111,9 +153,12 @@ public class DbCtrl {
     static String deleteLine(String lineName){
         String sqlPre = "select count(*) from line where line_name = ?";
         String sql = "delete from line where line_name = ?";
+        String sql2 = "delete from line_station where line_id = (select id from line where line_name = ?)";
         try {
             PreparedStatement psPre = conn.prepareStatement(sqlPre);
             PreparedStatement ps = conn.prepareStatement(sql);
+            PreparedStatement ps2 = conn.prepareStatement(sql2);
+            ps2.setString(1, lineName);
             psPre.setString(1, lineName);
             ps.setString(1, lineName);
             ResultSet rs = psPre.executeQuery();
@@ -121,7 +166,9 @@ public class DbCtrl {
             if (rs.getInt(1) == 0) {
                 return " \" " + lineName + "\" not found";
             }
+            ps2.executeUpdate();
             ps.executeUpdate();
+            ps2.close();
             ps.close();
             rs.close();
             return " \" " + lineName + "\" deleted successfully";
@@ -234,21 +281,31 @@ public class DbCtrl {
                 "((select id from station where chinese_name = ?), ?, (select id from passenger where id_number = ?), ?)";
         String sqlPre = "select count(*) from station where chinese_name = ?";
         String sqlPre2 = "select count(*) from passenger where id_number = ?";
+        String sqlPre3 = "select status from station where chinese_name = ?";
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             PreparedStatement psPre = conn.prepareStatement(sqlPre);
             PreparedStatement psPre2 = conn.prepareStatement(sqlPre2);
+            PreparedStatement psPre3 = conn.prepareStatement(sqlPre3);
             psPre.setString(1, stationName);
             psPre2.setString(1, passengerID);
+            psPre3.setString(1,stationName);
             ResultSet rs = psPre.executeQuery();
             ResultSet rs2 = psPre2.executeQuery();
+            ResultSet rs3 = psPre3.executeQuery();
             rs.next();
             rs2.next();
+            rs3.next();
             if (rs.getInt(1) == 0) {
                 return " \" " + stationName + "\" not found";
             }
             if (rs2.getInt(1) == 0) {
                 return " \" " + passengerID + "\" not found";
+            }
+            if (rs3.getString(1).equals("关闭中")) {
+                return " \" " + stationName + "\" is closed";
+            } else if (rs3.getString(1).equals("建设中")) {
+                return " \" " + stationName + "\" is under construction";
             }
             ps.setString(1, stationName);
             ps.setTimestamp(2, Timestamp.valueOf(startTime));
@@ -486,7 +543,7 @@ public class DbCtrl {
             rsGetEndStationId.close();
             rsGetStartTime.close();
             rsGetPrice.close();
-            return "Card " + passengerID + " recorded out at " + stationName + " at " + time + " with price " + price + " and carriage " + carriage;
+            return "Passenger " + passengerID + " recorded out at " + stationName + " at " + time + " with price " + price + " and carriage " + carriage;
         } catch (SQLException e) {
             e.printStackTrace();
             return e.getSQLState() + ": " + e.getMessage();
@@ -800,6 +857,30 @@ public class DbCtrl {
             e.printStackTrace();
             result.add(e.getSQLState() + ": " + e.getMessage());
             return result;
+        }
+    }
+
+    public static String modifyPassword(String username ,String oldPassword, String newPassword) {
+        String sql = "select password from \"user\" where username = ?";
+        String sql2 = "update \"user\" set password = ? where username = ?";
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            PreparedStatement ps2 = conn.prepareStatement(sql2);
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            if (!rs.next()){
+                return "User not found";
+            }
+            if (!rs.getString(1).equals(oldPassword)) {
+                return "Old password is incorrect";
+            }
+            ps2.setString(1, newPassword);
+            ps2.setString(2, username);
+            ps2.executeUpdate();
+            return "Password modified successfully";
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return e.getSQLState() + ": " + e.getMessage();
         }
     }
 
