@@ -10,14 +10,11 @@ import java.awt.*;
 import java.sql.SQLException;
 
 public class UserFrame extends JFrame {
-    private JTextArea sqlTextArea;
-    private JTextArea resultTextArea;
-
 
     public void SubwayManagementUI(LoginFrame.User user) {
         Font font = new Font("微软雅黑", Font.PLAIN, 12);
         setTitle("深圳地铁管理系统");
-        setSize(800, 600);
+        setSize(1200, 540);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
         setLocation(560, 300);
@@ -28,17 +25,17 @@ public class UserFrame extends JFrame {
         add(userInfoLabel);
         JTextArea sqlTextArea = new JTextArea();
         JScrollPane sqlScrollPane = new JScrollPane(sqlTextArea);
-        sqlScrollPane.setBounds(10, 100, 500, 120);
+        sqlScrollPane.setBounds(40, 100, 500, 120);
         sqlScrollPane.setBorder(BorderFactory.createTitledBorder("输入SQL语句"));
         add(sqlScrollPane);
         JTextArea resultTextArea = new JTextArea();
         resultTextArea.setEditable(false);
         JScrollPane resultScrollPane = new JScrollPane(resultTextArea);
-        resultScrollPane.setBounds(10, 240, 500, 150);
+        resultScrollPane.setBounds(40, 240, 500, 150);
         resultScrollPane.setBorder(BorderFactory.createTitledBorder("结果输出"));
         add(resultScrollPane);
         JButton executeButton = new JButton("执行");
-        executeButton.setBounds(240, 400, 80, 30);
+        executeButton.setBounds(280, 400, 80, 30);
         executeButton.setFont(font);
         executeButton.setBackground(Color.getHSBColor(0.45f, 0.8f, 0.6f));
         executeButton.setForeground(Color.white);
@@ -49,7 +46,7 @@ public class UserFrame extends JFrame {
         int buttonWidth = 150;
         int buttonHeight = 35;
         int buttonSpacing = 20;
-        int startX = 600; // 按钮起始X坐标
+        int startX = 650; // 按钮起始X坐标
         int startY = 20; // 按钮起始Y坐标
 
         JButton modifyStationButton = new JButton("修改地铁站");
@@ -109,18 +106,25 @@ public class UserFrame extends JFrame {
         add(searchPathButton);
 
         JButton searchRideButton = new JButton("查询记录");
-        searchRideButton.setBounds(startX, startY + 8 * (buttonHeight + buttonSpacing), buttonWidth, buttonHeight);
+        searchRideButton.setBounds(startX+200, startY + 5 * (buttonHeight + buttonSpacing), buttonWidth, buttonHeight);
         searchRideButton.setFont(font);
         searchRideButton.setBackground(Color.getHSBColor(0.45f, 0.8f, 0.6f));
         searchRideButton.setForeground(Color.white);
         add(searchRideButton);
 
         JButton searchBusButton = new JButton("查询公交");
-        searchBusButton.setBounds(startX, startY + 9 * (buttonHeight + buttonSpacing), buttonWidth, buttonHeight);
+        searchBusButton.setBounds(startX+200, startY + 6 * (buttonHeight + buttonSpacing), buttonWidth, buttonHeight);
         searchBusButton.setFont(font);
         searchBusButton.setBackground(Color.getHSBColor(0.45f, 0.8f, 0.6f));
         searchBusButton.setForeground(Color.white);
         add(searchBusButton);
+
+        JButton searchLandmarkButton = new JButton("查询地标");
+        searchLandmarkButton.setBounds(startX+200, startY + 7 * (buttonHeight + buttonSpacing), buttonWidth, buttonHeight);
+        searchLandmarkButton.setFont(font);
+        searchLandmarkButton.setBackground(Color.getHSBColor(0.45f, 0.8f, 0.6f));
+        searchLandmarkButton.setForeground(Color.white);
+        add(searchLandmarkButton);
 
 
         modifyStationButton.addActionListener(e -> {
@@ -168,6 +172,10 @@ public class UserFrame extends JFrame {
             QueryBusFrame.showBusQuery();
         });
 
+        searchLandmarkButton.addActionListener(e -> {
+            QueryLandmarkFrame.showQueryLandmark();
+        });
+
 
         JButton exitButton = new JButton("退出");
         exitButton.setBounds(350, 20, buttonWidth/2-10, buttonHeight);
@@ -193,7 +201,7 @@ public class UserFrame extends JFrame {
             System.exit(0);
         });
         JLabel lblBackground = new JLabel();
-        lblBackground.setBounds(0, 0, 800, 550);
+        lblBackground.setBounds(-730, 0, 1920, 540);
         lblBackground.setIcon(new ImageIcon("src/pics/img_1.png"));
         add(lblBackground);
         setVisible(true);

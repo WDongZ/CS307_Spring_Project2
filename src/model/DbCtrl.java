@@ -884,6 +884,26 @@ public class DbCtrl {
         }
     }
 
+    public static ArrayList<String> queryLandmark(String landmark) {
+        String sql = "select chinese_name, exit from ldm_v where landmark_name = ?";
+        ArrayList<String> result = new ArrayList<>();
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, landmark);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                result.add(rs.getString(1) + "  " + rs.getString(2));
+            }
+            rs.close();
+            ps.close();
+            return result;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            result.add(e.getSQLState() + ": " + e.getMessage());
+            return result;
+        }
+    }
+
     static class Station{
         public Station(String district, String intro, String chineseName, String englishName, String status) {
             this.district = district;
